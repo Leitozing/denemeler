@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aşk Uyumu Hesaplama</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: pink;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .alan {
+            background: white;
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .baslik {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff5e5e;
+            margin-bottom: 20px;
+            background: #ffccd5;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .arkaplan {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://via.placeholder.com/150/ffccd5/ff5e5e?text=💕') repeat;
+            opacity: 0.2;
+            z-index: -1;
+            border-radius: 10px;
+        }
+
+        .input-alani {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-kismi {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 45%;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #ff5e5e;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ff5e5e;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .butonum {
+            background-color: #ff5e5e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .butonum:before, .butonum:after {
+            content: "♥";
+            font-size: 20px;
+            color: white;
+            position: absolute;
+        }
+
+        .butonum:before {
+            left: -15px;
+        }
+
+        .butonum:after {
+            right: -15px;
+        }
+
+        .sonuc {
+            max-height: 0;
+            overflow: hidden;
+            margin-top: 20px;
+            padding: 0 20px;
+            background: #ffe6e6;
+            border-radius: 10px;
+            text-align: center;
+            transition: max-height 0.5s ease;
+        }
+
+        .sonuc.goster {
+            padding: 20px;
+            max-height: 300px;
+        }
+
+        .sonuc .yuzde {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff5e5e;
+            margin-bottom: 10px;
+        }
+
+        .sonuc p {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="alan">
+        <div class="baslik">Aşk Uyumu Hesaplama</div>
+        <div class="arkaplan"></div>
+        
+        <div class="input-alani">
+            <div class="input-kismi">
+                <label for="erkekAdi">Erkek adı</label>
+                <input type="text" id="erkekAdi" placeholder="erkek adını girin">
+                <label for="burc1">Burcunuz</label>
+                <select id="burc1">
+                    <option value="Koç">Koç</option>
+                    <option value="Boğa">Boğa</option>
+                    <option value="İkizler">İkizler</option>
+                    <option value="Yengeç">Yengeç</option>
+                    <option value="Aslan">Aslan</option>
+                    <option value="Başak">Başak</option>
+                    <option value="Terazi">Terazi</option>
+                    <option value="Akrep">Akrep</option>
+                    <option value="Yay">Yay</option>
+                    <option value="Oğlak">Oğlak</option>
+                    <option value="Kova">Kova</option>
+                    <option value="Balık">Balık</option>
+                </select>
+            </div>
+
+            <div class="input-kismi">
+                <label for="kadinAdi">Kadın adı</label>
+                <input type="text" id="kadinAdi" placeholder="kadın adını girin">
+                <label for="burc2">Burcunuz</label>
+                <select id="burc2">
+                    <option value="Koç">Koç</option>
+                    <option value="Boğa">Boğa</option>
+                    <option value="İkizler">İkizler</option>
+                    <option value="Yengeç">Yengeç</option>
+                    <option value="Aslan">Aslan</option>
+                    <option value="Başak">Başak</option>
+                    <option value="Terazi">Terazi</option>
+                    <option value="Akrep">Akrep</option>
+                    <option value="Yay">Yay</option>
+                    <option value="Oğlak">Oğlak</option>
+                    <option value="Kova">Kova</option>
+                    <option value="Balık">Balık</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="butonum" onclick="calculateLove()">Hesapla!</button>
+
+        <div id="sonuc" class="sonuc">
+            <div class="yuzde" id="yuzde">%</div>
+            <p id="description"></p>
+        </div>
+    </div>
+
+    <script>
+        const previoussonucs = {};
+    
+        function calculateLove() {
+            const erkekAdi = document.getElementById("erkekAdi").value.trim();
+            const kadinAdi = document.getElementById("kadinAdi").value.trim();
+            const erkekBurcu = document.getElementById("burc1").value;
+            const kadinBurcu = document.getElementById("burc2").value;
+    
+            if (!erkekAdi || !kadinAdi) {
+                alert("Lütfen isimlerinizi giriniz!");
+                return;
+            }
+    
+            const nameKey = `${erkekAdi}_${kadinAdi}`;
+    
+            let randomyuzde;
+    
+            if (previoussonucs[nameKey] !== undefined) {
+                randomyuzde = previoussonucs[nameKey];
+            } else {
+                randomyuzde = Math.floor(Math.random() * 31);
+                previoussonucs[nameKey] = randomyuzde;
+            }
+    
+            let burcUyumu = 0;
+
+            switch (erkekBurcu + "_" + kadinBurcu) {
+                case "Koç_Koç": burcUyumu = 35; break;
+                case "Koç_Boğa": burcUyumu = 35; break;
+                case "Koç_İkizler": burcUyumu = 49; break;
+                case "Koç_Yengeç": burcUyumu = 21; break;
+                case "Koç_Aslan": burcUyumu = 56; break;
+                case "Koç_Başak": burcUyumu = 21; break;
+                case "Koç_Terazi": burcUyumu = 63; break;
+                case "Koç_Akrep": burcUyumu = 49; break;
+                case "Koç_Yay": burcUyumu = 63; break;
+                case "Koç_Oğlak": burcUyumu = 21; break;
+                case "Koç_Kova": burcUyumu = 35; break;
+                case "Koç_Balık": burcUyumu = 35; break;
+
+                case "Boğa_Koç": burcUyumu = 35; break;
+                case "Boğa_Boğa": burcUyumu = 42; break;
+                case "Boğa_İkizler": burcUyumu = 28; break;
+                case "Boğa_Yengeç": burcUyumu = 56; break;
+                case "Boğa_Aslan": burcUyumu = 56; break;
+                case "Boğa_Başak": burcUyumu = 63; break;
+                case "Boğa_Terazi": burcUyumu = 49; break;
+                case "Boğa_Akrep": burcUyumu = 56; break;
+                case "Boğa_Yay": burcUyumu = 35; break;
+                case "Boğa_Oğlak": burcUyumu = 49; break;
+                case "Boğa_Kova": burcUyumu = 14; break;
+                case "Boğa_Balık": burcUyumu = 56; break;
+
+                case "İkizler_Koç": burcUyumu = 49; break;
+                case "İkizler_Boğa": burcUyumu = 28; break;
+                case "İkizler_İkizler": burcUyumu = 28; break;
+                case "İkizler_Yengeç": burcUyumu = 42; break;
+                case "İkizler_Aslan": burcUyumu = 56; break;
+                case "İkizler_Başak": burcUyumu = 35; break;
+                case "İkizler_Terazi": burcUyumu = 56; break;
+                case "İkizler_Akrep": burcUyumu = 28; break;
+                case "İkizler_Yay": burcUyumu = 49; break;
+                case "İkizler_Oğlak": burcUyumu = 14; break;
+                case "İkizler_Kova": burcUyumu = 49; break;
+                case "İkizler_Balık": burcUyumu = 21; break;
+
+                case "Yengeç_Koç": burcUyumu = 21; break;
+                case "Yengeç_Boğa": burcUyumu = 56; break;
+                case "Yengeç_İkizler": burcUyumu = 28; break;
+                case "Yengeç_Yengeç": burcUyumu = 42; break;
+                case "Yengeç_Aslan": burcUyumu = 14; break;
+                case "Yengeç_Başak": burcUyumu = 49; break;
+                case "Yengeç_Terazi": burcUyumu = 42; break;
+                case "Yengeç_Akrep": burcUyumu = 56; break;
+                case "Yengeç_Yay": burcUyumu = 14; break;
+                case "Yengeç_Oğlak": burcUyumu = 49; break;
+                case "Yengeç_Kova": burcUyumu = 7; break;
+                case "Yengeç_Balık": burcUyumu = 63; break;
+
+                case "Aslan_Koç": burcUyumu = 56; break;
+                case "Aslan_Boğa": burcUyumu = 49; break;
+                case "Aslan_İkizler": burcUyumu = 56; break;
+                case "Aslan_Yengeç": burcUyumu = 14; break;
+                case "Aslan_Aslan": burcUyumu = 35; break;
+                case "Aslan_Başak": burcUyumu = 7; break;
+                case "Aslan_Terazi": burcUyumu = 49; break;
+                case "Aslan_Akrep": burcUyumu = 35; break;
+                case "Aslan_Yay": burcUyumu = 49; break;
+                case "Aslan_Oğlak": burcUyumu = 21; break;
+                case "Aslan_Kova": burcUyumu = 35; break;
+                case "Aslan_Balık": burcUyumu = 42; break;
+
+                case "Başak_Koç": burcUyumu = 21; break;
+                case "Başak_Boğa": burcUyumu = 63; break;
+                case "Başak_İkizler": burcUyumu = 35; break;
+                case "Başak_Yengeç": burcUyumu = 35; break;
+                case "Başak_Aslan": burcUyumu = 7; break;
+                case "Başak_Başak": burcUyumu = 21; break;
+                case "Başak_Terazi": burcUyumu = 14; break;
+                case "Başak_Akrep": burcUyumu = 35; break;
+                case "Başak_Yay": burcUyumu = 28; break;
+                case "Başak_Oğlak": burcUyumu = 35; break;
+                case "Başak_Kova": burcUyumu = 28; break;
+                case "Başak_Balık": burcUyumu = 42; break;
+
+                case "Terazi_Koç": burcUyumu = 63; break;
+                case "Terazi_Boğa": burcUyumu = 49; break;
+                case "Terazi_İkizler": burcUyumu = 56; break;
+                case "Terazi_Yengeç": burcUyumu = 42; break;
+                case "Terazi_Aslan": burcUyumu = 49; break;
+                case "Terazi_Başak": burcUyumu = 14; break;
+                case "Terazi_Terazi": burcUyumu = 49; break;
+                case "Terazi_Akrep": burcUyumu = 42; break;
+                case "Terazi_Yay": burcUyumu = 56; break;
+                case "Terazi_Oğlak": burcUyumu = 35; break;
+                case "Terazi_Kova": burcUyumu = 56; break;
+                case "Terazi_Balık": burcUyumu = 21; break;
+
+                case "Akrep_Koç": burcUyumu = 49; break;
+                case "Akrep_Boğa": burcUyumu = 56; break;
+                case "Akrep_İkizler": burcUyumu = 28; break;
+                case "Akrep_Yengeç": burcUyumu = 56; break;
+                case "Akrep_Aslan": burcUyumu = 35; break;
+                case "Akrep_Başak": burcUyumu = 35; break;
+                case "Akrep_Terazi": burcUyumu = 42; break;
+                case "Akrep_Akrep": burcUyumu = 35; break;
+                case "Akrep_Yay": burcUyumu = 21; break;
+                case "Akrep_Oğlak": burcUyumu = 49; break;
+                case "Akrep_Kova": burcUyumu = 42; break;
+                case "Akrep_Balık": burcUyumu = 56; break;
+
+                case "Yay_Koç": burcUyumu = 63; break;
+                case "Yay_Boğa": burcUyumu = 35; break;
+                case "Yay_İkizler": burcUyumu = 49; break;
+                case "Yay_Yengeç": burcUyumu = 14; break;
+                case "Yay_Aslan": burcUyumu = 49; break;
+                case "Yay_Başak": burcUyumu = 28; break;
+                case "Yay_Terazi": burcUyumu = 56; break;
+                case "Yay_Akrep": burcUyumu = 21; break;
+                case "Yay_Yay": burcUyumu = 35; break;
+                case "Yay_Oğlak": burcUyumu = 28; break;
+                case "Yay_Kova": burcUyumu = 49; break;
+                case "Yay_Balık": burcUyumu = 42; break;
+
+                case "Oğlak_Koç": burcUyumu = 21; break;
+                case "Oğlak_Boğa": burcUyumu = 49; break;
+                case "Oğlak_İkizler": burcUyumu = 14; break;
+                case "Oğlak_Yengeç": burcUyumu = 49; break;
+                case "Oğlak_Aslan": burcUyumu = 21; break;
+                case "Oğlak_Başak": burcUyumu = 35; break;
+                case "Oğlak_Terazi": burcUyumu = 35; break;
+                case "Oğlak_Akrep": burcUyumu = 49; break;
+                case "Oğlak_Yay": burcUyumu = 28; break;
+                case "Oğlak_Oğlak": burcUyumu = 21; break;
+                case "Oğlak_Kova": burcUyumu = 14; break;
+                case "Oğlak_Balık": burcUyumu = 49; break;
+
+                case "Kova_Koç": burcUyumu = 35; break;
+                case "Kova_Boğa": burcUyumu = 14; break;
+                case "Kova_İkizler": burcUyumu = 49; break;
+                case "Kova_Yengeç": burcUyumu = 7; break;
+                case "Kova_Aslan": burcUyumu = 35; break;
+                case "Kova_Başak": burcUyumu = 28; break;
+                case "Kova_Terazi": burcUyumu = 56; break;
+                case "Kova_Akrep": burcUyumu = 42; break;
+                case "Kova_Yay": burcUyumu = 49; break;
+                case "Kova_Oğlak": burcUyumu = 14; break;
+                case "Kova_Kova": burcUyumu = 35; break;
+                case "Kova_Balık": burcUyumu = 35; break;
+
+                case "Balık_Koç": burcUyumu = 35; break;
+                case "Balık_Boğa": burcUyumu = 56; break;
+                case "Balık_İkizler": burcUyumu = 21; break;
+                case "Balık_Yengeç": burcUyumu = 63; break;
+                case "Balık_Aslan": burcUyumu = 42; break;
+                case "Balık_Başak": burcUyumu = 42; break;
+                case "Balık_Terazi": burcUyumu = 21; break;
+                case "Balık_Akrep": burcUyumu = 56; break;
+                case "Balık_Yay": burcUyumu = 42; break;
+                case "Balık_Oğlak": burcUyumu = 49; break;
+                case "Balık_Kova": burcUyumu = 35; break;
+                case "Balık_Balık": burcUyumu = 49; break;
+            }
+
+    
+            const totalyuzde = randomyuzde + burcUyumu;
+            const description = "İkiniz arasında güçlü bir uyum var. Zorluklar karşısında birlikte hareket ederek ilişkiyi güçlendirebilirsiniz. Sevgi, saygı ve güven bağlarınızı sıkı tutarak daha uyumlu bir birliktelik kurabilirsiniz.";
+    
+            document.getElementById("yuzde").innerText = `%${totalyuzde}`;
+            document.getElementById("description").innerText = description;
+    
+            const sonucDiv = document.getElementById("sonuc");
+            sonucDiv.classList.add("goster");
+        }
+    </script>
+    
+    
+</body>
+</html>
